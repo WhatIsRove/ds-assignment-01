@@ -1,23 +1,18 @@
 import * as cdk from 'aws-cdk-lib';
+import * as lambdanode from "aws-cdk-lib/aws-lambda-nodejs";
+import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
 import * as custom from "aws-cdk-lib/custom-resources";
 import { generateBatch } from '../shared/util';
 import { games } from '../seed/games';
 import * as apig from "aws-cdk-lib/aws-apigateway";
+
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class GameLibraryAppStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-
-    // The code that defines your stack goes here
-
-    // example resource
-    // const queue = new sqs.Queue(this, 'GameLibraryAppQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
-
 
     //create dynamodb table for games
     const gamesTable = new dynamodb.Table(this, "gamesTable", {
@@ -45,6 +40,28 @@ export class GameLibraryAppStack extends cdk.Stack {
       }),
     });
 
+    //lambda functions
+    const getAllGamesFn = new lambdanode.NodejsFunction(
+      this,
+      "GetAllGamesFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_18_X,
+        entry: `${__dirname}/../lambdas/getAllGames.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: gamesTable.tableName,
+          REGION: "eu-west-1"
+        }
+      }
+    );
+
+    
+
+    //permissions
+    gamesTable.grantReadData(getAllGamesFn);
+
 
     //rest api
     const api = new apig.RestApi(this, "RestAPI", {
@@ -63,7 +80,7 @@ export class GameLibraryAppStack extends cdk.Stack {
     const gamesEndpoint = api.root.addResource("games");
     gamesEndpoint.addMethod(
       "GET",
-      //new apig.LambdaIntegration(..., { proxy: true })
+      new apig.LambdaIntegration(getAllGamesFn, { proxy: true })
     );
   }
 }
