@@ -57,7 +57,7 @@ export class GameLibraryAppStack extends cdk.Stack {
       }
     );
 
-    const getGameById = new lambdanode.NodejsFunction(
+    const getGameByIdFn = new lambdanode.NodejsFunction(
       this,
       "GetGameByIdFn",
       {
@@ -73,10 +73,26 @@ export class GameLibraryAppStack extends cdk.Stack {
       }
     )
 
+    const addGameFn = new lambdanode.NodejsFunction(
+      this,
+      "AddGameFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_18_X,
+        entry: `${__dirname}/../lambdas/addGame.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: gamesTable.tableName,
+          REGION: "eu-west-1"
+        }
+      }
+    )
+
     //permissions
     gamesTable.grantReadData(getAllGamesFn);
-    gamesTable.grantReadData(getGameById);
-
+    gamesTable.grantReadData(getGameByIdFn);
+    gamesTable.grantReadWriteData(addGameFn);
 
     //rest api
     const api = new apig.RestApi(this, "RestAPI", {
@@ -98,10 +114,15 @@ export class GameLibraryAppStack extends cdk.Stack {
       new apig.LambdaIntegration(getAllGamesFn, { proxy: true })
     );
 
+    gamesEndpoint.addMethod(
+      "POST",
+      new apig.LambdaIntegration(addGameFn, { proxy: true })
+    );
+
     const gameEndpoint = gamesEndpoint.addResource("{gameId}");
     gameEndpoint.addMethod(
       "GET",
-      new apig.LambdaIntegration(getGameById, {proxy: true})
+      new apig.LambdaIntegration(getGameByIdFn, {proxy: true})
     );
   }
 }
