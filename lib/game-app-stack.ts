@@ -8,8 +8,6 @@ import { Construct } from 'constructs';
 import { generateBatch } from '../shared/util';
 import { games } from '../seed/games';
 
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
-
 export class GameAppApi extends Construct {
   constructor(scope: Construct, id: string, props: {}) {
     super(scope, id);
