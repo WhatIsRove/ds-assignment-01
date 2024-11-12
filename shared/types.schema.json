@@ -1,0 +1,53 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "Game": {
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "developer": {
+                    "type": "string"
+                },
+                "genre": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "id": {
+                    "type": "number"
+                },
+                "price": {
+                    "type": "string"
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "reviewCount": {
+                    "type": "number"
+                },
+                "reviewPercentage": {
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "description",
+                "developer",
+                "genre",
+                "id",
+                "price",
+                "releaseDate",
+                "reviewCount",
+                "reviewPercentage",
+                "title"
+            ],
+            "type": "object"
+        }
+    }
+}
+
