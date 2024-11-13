@@ -18,6 +18,9 @@ export class AuthApi extends Construct {
 
         const authApi = new apig.RestApi(this, "AuthApiService", {
             description: "Authentication Rest Api",
+            deployOptions: {
+                stageName: "profile"
+            },
             endpointTypes: [apig.EndpointType.REGIONAL],
             defaultCorsPreflightOptions: {
                 allowOrigins: apig.Cors.ALL_ORIGINS
@@ -26,7 +29,7 @@ export class AuthApi extends Construct {
 
         this.auth = authApi.root.addResource("auth");
 
-
+        this.addAuthRoute("signup", "POST", "SignUpFn", "signup.ts");
     }
 
     private addAuthRoute(
@@ -53,7 +56,7 @@ export class AuthApi extends Construct {
         
         const fn = new lambdanode.NodejsFunction(this, fnName, {
           ...commonFnDetails,
-          entry: `${__dirname}/../lambda/auth/${fnEntry}`,
+          entry: `${__dirname}/../lambdas/auth/${fnEntry}`,
         });
     
         resource.addMethod(method, new apig.LambdaIntegration(fn));
