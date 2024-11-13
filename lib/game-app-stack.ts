@@ -100,6 +100,15 @@ export class GameAppApi extends Construct {
             }
         )
 
+        const removeGameFn = new lambdanode.NodejsFunction(
+            this,
+            "RemoveGameFn",
+            {
+                ...commonFnDetails,
+                entry: `${__dirname}/../lambdas/removeGame.ts`
+            }
+        )
+
         const authorizerFn = new lambdanode.NodejsFunction(
             this,
             "AuthorizerFn",
@@ -125,6 +134,7 @@ export class GameAppApi extends Construct {
         gamesTable.grantReadWriteData(addGameFn);
         gamesTable.grantReadWriteData(updateGameFn);
         gamesTable.grantReadData(translateGameDescFn);
+        gamesTable.grantReadWriteData(removeGameFn);
 
         translateGameDescFn.addToRolePolicy(new iam.PolicyStatement({
             actions: [
@@ -177,6 +187,15 @@ export class GameAppApi extends Construct {
                 authorizationType: apig.AuthorizationType.CUSTOM
             }
         );
+
+        gameEndpoint.addMethod(
+            "DELETE",
+            new apig.LambdaIntegration(removeGameFn, { proxy: true }),
+            {
+                authorizer: requestAuthorizer,
+                authorizationType: apig.AuthorizationType.CUSTOM
+            }
+        )
 
         const translateEndpoint = gameEndpoint.addResource("translate");
         translateEndpoint.addMethod(

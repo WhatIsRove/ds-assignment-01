@@ -63,7 +63,11 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
             new ScanCommand(commandInput)
         );
 
-        if (!commandOutput.Items) {
+        const body = {
+            data: commandOutput.Items
+        }
+
+        if (body.data?.length == 0) {
             return {
                 statusCode: 404,
                 headers: {
@@ -71,10 +75,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
                 },
                 body: JSON.stringify({ Message: "Invalid, no games found" }),
             };
-        }
-
-        const body = {
-            data: commandOutput.Items
         }
 
         return {
