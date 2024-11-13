@@ -1,8 +1,10 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { TranslateClient, TranslateTextCommand } from "@aws-sdk/client-translate";
 
 const ddbDocClient = createDDbDocClient();
+const translateClient = new TranslateClient({ region: process.env.REGION });
 
 export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     try {
@@ -10,6 +12,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
 
         const parameters = event?.pathParameters;
         const gameId = parameters?.gameId ? parseInt(parameters.gameId) : undefined;
+        const language = event.queryStringParameters?.language ? event.queryStringParameters.language : undefined;
 
         if (!gameId) {
             return {
@@ -18,6 +21,16 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
                     "content-type": "application/json"
                 },
                 body: JSON.stringify({ Message: "Missing game id."})
+            }
+        }
+
+        if (!language) {
+            return {
+                statusCode: 400,
+                headers: {
+                    "content-type": "application/json"
+                },
+                body: JSON.stringify({ Message: "Missing language parameter."})
             }
         }
 
@@ -40,6 +53,14 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
                 body: JSON.stringify({ Message: "Invalid, game not found."})
             }
         }
+
+        commandOutput.Items[0].description = await translateClient.send(
+            new TranslateTextCommand({
+                Text: commandOutput.Items[0].description,
+                SourceLanguageCode: "en",
+                TargetLanguageCode: language
+            })
+        );
 
         const body = {
             data: commandOutput.Items

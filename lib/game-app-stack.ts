@@ -4,6 +4,7 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as custom from "aws-cdk-lib/custom-resources";
 import * as apig from "aws-cdk-lib/aws-apigateway";
+import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
 import { generateBatch } from '../shared/util';
 import { games } from '../seed/games';
@@ -87,7 +88,16 @@ export class GameAppApi extends Construct {
             {
                 ...commonFnDetails,
                 entry: `${__dirname}/../lambdas/updateGame.ts`
-        }
+            }
+        )
+
+        const translateGameDescFn = new lambdanode.NodejsFunction(
+            this,
+            "TranslateGameDescFn",
+            {
+                ...commonFnDetails,
+                entry: `${__dirname}/../lambdas/translateGame.ts`
+            }
         )
 
         const authorizerFn = new lambdanode.NodejsFunction(
@@ -114,6 +124,15 @@ export class GameAppApi extends Construct {
         gamesTable.grantReadData(getGameByIdFn);
         gamesTable.grantReadWriteData(addGameFn);
         gamesTable.grantReadWriteData(updateGameFn);
+        gamesTable.grantReadData(translateGameDescFn);
+
+        translateGameDescFn.addToRolePolicy(new iam.PolicyStatement({
+            actions: [
+                "translate:TranslateText"
+            ],
+            effect: iam.Effect.ALLOW,
+            resources: ["*"]
+        }))
 
         //rest api
         const api = new apig.RestApi(this, "RestAPI", {
@@ -157,6 +176,12 @@ export class GameAppApi extends Construct {
                 authorizer: requestAuthorizer,
                 authorizationType: apig.AuthorizationType.CUSTOM
             }
-        )
+        );
+
+        const translateEndpoint = gameEndpoint.addResource("translate");
+        translateEndpoint.addMethod(
+            "GET",
+            new apig.LambdaIntegration(translateGameDescFn, { proxy: true })
+        );
     }
 }
