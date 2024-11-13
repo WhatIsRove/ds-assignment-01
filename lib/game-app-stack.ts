@@ -45,8 +45,11 @@ export class GameAppApi extends Construct {
         runtime: lambda.Runtime.NODEJS_18_X,
         timeout: cdk.Duration.seconds(10),
         memorySize: 128,
+        handler: "handler",
         environment: {
           TABLE_NAME: gamesTable.tableName,
+          USER_POOL_ID: props.userPoolId,
+          CLIENT_ID: props.userPoolClientId,
           REGION: "eu-west-1"
         }
     }
@@ -78,6 +81,25 @@ export class GameAppApi extends Construct {
       }
     )
 
+    const authorizerFn = new lambdanode.NodejsFunction(
+        this,
+        "AuthorizerFn",
+        {
+            ...commonFnDetails,
+            entry: `${__dirname}/../lambdas/auth/authorizer.ts`
+        }
+    )
+
+    const requestAuthorizer = new apig.RequestAuthorizer(
+        this,
+        "RequestAuthorizer",
+        {
+            identitySources: [apig.IdentitySource.header("cookie")],
+            handler: authorizerFn,
+            resultsCacheTtl: cdk.Duration.minutes(0)
+        }
+    )
+
     //permissions
     gamesTable.grantReadData(getAllGamesFn);
     gamesTable.grantReadData(getGameByIdFn);
@@ -105,7 +127,11 @@ export class GameAppApi extends Construct {
 
     gamesEndpoint.addMethod(
       "POST",
-      new apig.LambdaIntegration(addGameFn, { proxy: true })
+      new apig.LambdaIntegration(addGameFn, { proxy: true }),
+      {
+        authorizer: requestAuthorizer,
+        authorizationType: apig.AuthorizationType.CUSTOM
+      }
     );
 
     const gameEndpoint = gamesEndpoint.addResource("{gameId}");

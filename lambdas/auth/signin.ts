@@ -7,7 +7,7 @@ import schema from "../../shared/types.schema.json";
 const ajv = new Ajv();
 const isValidBodyParams = ajv.compile(schema.definitions["SignInTypes"] || {});
 
-const client = new CognitoIdentityProviderClient({region: process.env.REGION});
+const client = new CognitoIdentityProviderClient({ region: process.env.REGION });
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
     try {
@@ -15,16 +15,17 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
         const body = event.body ? JSON.parse(event.body) : undefined;
 
         if (!isValidBodyParams(body)) {
-            return {
+            const res = {
                 statusCode: 500,
                 headers: {
-                  "content-type": "application/json",
+                    "content-type": "application/json",
                 },
                 body: JSON.stringify({
-                  message: `Wrong type, must match SignInTypes schema`,
-                  schema: schema.definitions["SignInTypes"],
+                    message: `Incorrect type. Must match SignInTypes schema`,
+                    schema: schema.definitions["SignInTypes"],
                 }),
             };
+            return res;
         }
 
         const signInBody = body as SignInTypes;
@@ -38,7 +39,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
             }
         }
 
-        const AuthenticationResult = await client.send(
+        const { AuthenticationResult } = await client.send(
             new InitiateAuthCommand(params)
         );
 
