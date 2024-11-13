@@ -36,5 +36,29 @@ export const games : Game[] = [
         reviewPercentage: 97,
         developer: "ConcernedApe",
         clientId: "0"
-    }
+    },
+    {
+        id: 78123,
+        title: "The Witcher 3: Wild Hunt",
+        description: "Play as Geralt of Rivia, a monster hunter tasked with finding a child of prophecy in a vast open world rich with merchant cities, pirate islands, dangerous mountain passes, and forgotten caverns.",
+        price: "$39.99",
+        genre: ["Action", "RPG"],
+        releaseDate: "2015-05-18",
+        reviewCount: 700000,
+        reviewPercentage: 98,
+        developer: "CD PROJEKT RED",
+        clientId: "0"
+    },
+    {
+        id: 33421,
+        title: "Portal 2",
+        description: "Portal 2 brings back the award-winning formula of innovative gameplay, story, and music that earned the original Portal over 70 industry accolades and created a cult following.",
+        price: "$9.99",
+        genre: ["Puzzle", "Platformer"],
+        releaseDate: "2011-04-18",
+        reviewCount: 250000,
+        reviewPercentage: 99,
+        developer: "Valve",
+        clientId: "0"
+    },
 ]
