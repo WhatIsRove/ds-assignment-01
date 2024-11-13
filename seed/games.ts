@@ -11,6 +11,7 @@ export const games : Game[] = [
         reviewCount: 210000,
         reviewPercentage: 98,
         developer: "Supergiant Games",
+        clientId: "0"
     },
     {
         id: 55341,
@@ -22,6 +23,7 @@ export const games : Game[] = [
         reviewCount: 450000,
         reviewPercentage: 77,
         developer: "CD PROJEKT RED",
+        clientId: "0"
     },
     {
         id: 51234,
@@ -33,5 +35,6 @@ export const games : Game[] = [
         reviewCount: 390000,
         reviewPercentage: 97,
         developer: "ConcernedApe",
+        clientId: "0"
     }
 ]

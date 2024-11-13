@@ -36,6 +36,9 @@
         "Game": {
             "additionalProperties": false,
             "properties": {
+                "clientId": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },

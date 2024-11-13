@@ -20,7 +20,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
                 headers: {
                   "content-type": "application/json",
                 },
-                body: JSON.stringify({ Message: "Invalid game Id" }),
+                body: JSON.stringify({ Message: "Invalid, no games" }),
             };
         }
 

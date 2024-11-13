@@ -13,7 +13,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     try {
         console.log("[Event]: ", event);
 
-        const body = event.body ? JSON.parse(event.body) : undefined;
+        let body = event.body ? JSON.parse(event.body) : undefined;
 
         if (!body) {
             return {
@@ -36,6 +36,11 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
                   schema: schema.definitions["Game"],
                 }),
             };
+        }
+
+        body = {
+            ...body,
+            clientId: process.env.CLIENT_ID!
         }
 
         const commandOutput = await ddbDocClient.send(
