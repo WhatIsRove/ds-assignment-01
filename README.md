@@ -4,7 +4,7 @@
 
 __Name:__ Grantas Valiukas
 
-__Demo:__ ... link to your YouTube video demonstration ......
+__Demo:__ [Youtube Demo](https://youtu.be/5Vm6noFQXLw)
 
 ### Context.
 
@@ -41,10 +41,14 @@ queryParams:
 + DELETE /games/{gameId} - Deletes a 'game' with the relavant {gameId}, requires Authorization/Login, and matching clientId to the current logged in user to use.
 
 + GET /games/{gameId}/translate?language=languageCode - Granslates game descriptions to the relavant language in the parameters
+
 ### Update constraint (if relevant).
 
-[Briefly explain your design for the solution to the PUT/Update constraint 
-- only the user who added an item to the main table could update it.]
+When creating a game data listing, it can only be allowed if a user is logged in via authentication.
+
+The current user client id is saved within the added listing as `clientId: string`, saving it for access later.
+
+If the user attempts to edit or delete a listing, it will first retrieve the clientId from that listing and compare it to the current `CLIENT_ID` in `process.env.CLIENT_ID`, if it fails it returns status code 400, otherwise it allows the user to continue with their PUT or DELETE attempt.
 
 ### Translation persistence (if relevant).
 
