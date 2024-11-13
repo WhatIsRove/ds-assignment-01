@@ -31,6 +31,8 @@ export class AuthApi extends Construct {
 
         this.addAuthRoute("signup", "POST", "SignUpFn", "signup.ts");
         this.addAuthRoute("confirm_signup", "POST", "ConfirmSignUpFn", "confirm_signup.ts");
+        this.addAuthRoute("signin", "POST", "SignInFn", "signin.ts");
+        this.addAuthRoute("signout", "GET", "SignOutFn", "signout.ts");
     }
 
     private addAuthRoute(

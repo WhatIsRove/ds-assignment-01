@@ -80,6 +80,22 @@
             ],
             "type": "object"
         },
+        "SignInTypes": {
+            "additionalProperties": false,
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "password",
+                "username"
+            ],
+            "type": "object"
+        },
         "SignUpTypes": {
             "additionalProperties": false,
             "properties": {
