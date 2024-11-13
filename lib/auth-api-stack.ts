@@ -30,6 +30,7 @@ export class AuthApi extends Construct {
         this.auth = authApi.root.addResource("auth");
 
         this.addAuthRoute("signup", "POST", "SignUpFn", "signup.ts");
+        this.addAuthRoute("confirm_signup", "POST", "ConfirmSignUpFn", "confirm_signup.ts");
     }
 
     private addAuthRoute(
