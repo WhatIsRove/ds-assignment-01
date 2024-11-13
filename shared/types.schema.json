@@ -1,6 +1,22 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
+        "AuthProps": {
+            "additionalProperties": false,
+            "properties": {
+                "userPoolClientId": {
+                    "type": "string"
+                },
+                "userPoolId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "userPoolClientId",
+                "userPoolId"
+            ],
+            "type": "object"
+        },
         "Game": {
             "additionalProperties": false,
             "properties": {
@@ -45,6 +61,26 @@
                 "reviewCount",
                 "reviewPercentage",
                 "title"
+            ],
+            "type": "object"
+        },
+        "SignUpTypes": {
+            "additionalProperties": false,
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "email",
+                "password",
+                "username"
             ],
             "type": "object"
         }

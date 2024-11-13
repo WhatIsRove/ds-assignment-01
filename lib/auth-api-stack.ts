@@ -14,6 +14,8 @@ export class AuthApi extends Construct {
     constructor(scope: Construct, id: string, props: AuthProps) {
         super(scope, id);
 
+        ({ userPoolId: this.userPoolId, userPoolClientId: this.userPoolClientId } = props)
+
         const authApi = new apig.RestApi(this, "AuthApiService", {
             description: "Authentication Rest Api",
             endpointTypes: [apig.EndpointType.REGIONAL],
@@ -24,7 +26,7 @@ export class AuthApi extends Construct {
 
         this.auth = authApi.root.addResource("auth");
 
-        
+
     }
 
     private addAuthRoute(
