@@ -7,9 +7,10 @@ import * as apig from "aws-cdk-lib/aws-apigateway";
 import { Construct } from 'constructs';
 import { generateBatch } from '../shared/util';
 import { games } from '../seed/games';
+import { AuthProps } from '../shared/types';
 
 export class GameAppApi extends Construct {
-  constructor(scope: Construct, id: string, props: {}) {
+  constructor(scope: Construct, id: string, props: AuthProps) {
     super(scope, id);
 
     //create dynamodb table for games
@@ -39,19 +40,23 @@ export class GameAppApi extends Construct {
     });
 
     //lambda functions
-    const getAllGamesFn = new lambdanode.NodejsFunction(
-      this,
-      "GetAllGamesFn",
-      {
+    const commonFnDetails = {
         architecture: lambda.Architecture.ARM_64,
         runtime: lambda.Runtime.NODEJS_18_X,
-        entry: `${__dirname}/../lambdas/getAllGames.ts`,
         timeout: cdk.Duration.seconds(10),
         memorySize: 128,
         environment: {
           TABLE_NAME: gamesTable.tableName,
           REGION: "eu-west-1"
         }
+    }
+
+    const getAllGamesFn = new lambdanode.NodejsFunction(
+      this,
+      "GetAllGamesFn",
+      {
+        ...commonFnDetails,
+        entry: `${__dirname}/../lambdas/getAllGames.ts`,
       }
     );
 
@@ -59,15 +64,8 @@ export class GameAppApi extends Construct {
       this,
       "GetGameByIdFn",
       {
-        architecture: lambda.Architecture.ARM_64,
-        runtime: lambda.Runtime.NODEJS_18_X,
+        ...commonFnDetails,
         entry: `${__dirname}/../lambdas/getGameById.ts`,
-        timeout: cdk.Duration.seconds(10),
-        memorySize: 128,
-        environment: {
-          TABLE_NAME: gamesTable.tableName,
-          REGION: "eu-west-1"
-        }
       }
     )
 
@@ -75,15 +73,8 @@ export class GameAppApi extends Construct {
       this,
       "AddGameFn",
       {
-        architecture: lambda.Architecture.ARM_64,
-        runtime: lambda.Runtime.NODEJS_18_X,
+        ...commonFnDetails,
         entry: `${__dirname}/../lambdas/addGame.ts`,
-        timeout: cdk.Duration.seconds(10),
-        memorySize: 128,
-        environment: {
-          TABLE_NAME: gamesTable.tableName,
-          REGION: "eu-west-1"
-        }
       }
     )
 
