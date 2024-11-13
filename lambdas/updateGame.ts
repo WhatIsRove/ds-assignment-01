@@ -108,6 +108,7 @@ function createDDbDocClient() {
     return DynamoDBDocumentClient.from(ddbClient, translateConfig);
 }
 
+//borrowed from https://gist.github.com/daverickdunn/4c6a0f61a0b969ec59e589353138bdc3
 const generateUpdateQuery = (fields) => {
     let exp = {
         UpdateExpression: 'SET',
